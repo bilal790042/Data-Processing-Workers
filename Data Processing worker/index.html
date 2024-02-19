@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Processing Application</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f0f0f0; /* Light gray background */
+        }
+
+        h1 {
+            color: #4CAF50; /* Green heading color */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #cfc5e7;
+            border-radius: 5px;
+        }
+
+        .btn-success {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #008CBA; /* Blue button background */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background-color: #005f6b; /* Darker blue on hover */
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            background-color: #fff; /* White background */
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+        }
+
+        #executionTime {
+            margin-top: 10px;
+            color: #555;
+            font-size: 14px;
+            padding: 8px;
+            background-color: #f8f8f8; /* Light gray background */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Light shadow */
+        }
+
+    </style>
+</head>
+
+<body>
+    <h1>Data Processing Application</h1>
+
+    <div class="container">
+        <div class="input-group">
+            <input type="text" id="dataInput" placeholder="Enter an array of numbers e.g., 2, 3, 4, 15, 56">
+        </div>
+
+        <button onclick="processDataWithoutWorkers()">Process Data Without Workers</button>
+        <button onclick="processDataWithWorkers()">Process Data With Workers</button>
+
+        <div id="result"></div>
+        <div id="executionTime"></div>
+    </div>
+
+    <script>
+        // Function to display the result
+        function displayResult(result) {
+            document.getElementById('result').innerText = `Result: ${result}`;
+        }
+
+        // Function to convert the input string to an array of numbers
+        function getInputData() {
+            const inputString = document.getElementById('dataInput').value;
+            return inputString.split(',').map(value => parseFloat(value.trim()));
+        }
+
+        // Function to process data without Web Workers
+        function processDataWithoutWorkers() {
+            const data = getInputData();
+            const startTime = performance.now();
+
+            const processedData = performComplexCalculationsWithoutWorkers(data);
+
+            const endTime = performance.now();
+            const elapsedTime = endTime - startTime;
+
+            displayResult(`Processed without Web Workers in ${elapsedTime} milliseconds`);
+            displayResult(`[${processedData}]`);
+        }
+
+        // Function to process data with Web Workers
+        function processDataWithWorkers() {
+            const data = getInputData();
+            const startTime = performance.now();
+
+            const worker = new Worker('dataProcessingWorker.js');
+
+            worker.onmessage = function (event) {
+                const processedData = event.data;
+
+                const endTime = performance.now();
+                const elapsedTime = endTime - startTime;
+
+                displayResult(`Processed with Web Workers in ${elapsedTime} milliseconds`);
+                displayResult(`[${processedData}]`);
+            };
+
+            worker.postMessage(data);
+        }
+    </script>
+    <script src="main.js"></script>
+    <script src="dataProcessingWorker.js"></script>
+
+
+</body>
+
+</html>
